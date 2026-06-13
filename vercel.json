@@ -4,16 +4,12 @@
     "api/**/*.ts": {
       "memory": 1024,
       "maxDuration": 15
-    },
-    "api/**/*.js": {
-      "memory": 1024,
-      "maxDuration": 15
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "destination": "/api"
     }
   ]
 }
