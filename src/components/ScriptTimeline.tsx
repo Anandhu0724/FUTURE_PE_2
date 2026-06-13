@@ -5,6 +5,7 @@ import {
   Volume2, RefreshCw, Music, User
 } from "lucide-react";
 import { Hook, ScriptSegment, UGCProject, CTA } from "../types";
+import AudioWaveformVisualizer from "./AudioWaveformVisualizer";
 
 interface ScriptTimelineProps {
   project: UGCProject;
@@ -221,8 +222,26 @@ export default function ScriptTimeline({
         }),
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server returned non-JSON error page:", errorText);
+        try {
+          const parsed = JSON.parse(errorText);
+          throw new Error(parsed.error || parsed.details || `Server responded with status ${response.status}`);
+        } catch (_) {
+          throw new Error(`Server responded with status ${response.status}: ${errorText.substring(0, 120)}`);
+        }
+      }
+
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const responseText = await response.text();
+        console.error("Expected JSON but received response body:", responseText);
+        throw new Error(`Invalid payload format (Expected JSON, received ${contentType.slice(0, 30)})`);
+      }
+
       const data = await response.json();
-      if (!response.ok || !data.success) {
+      if (!data || !data.success) {
         throw new Error(data.error || "Synthesis was unsuccessful.");
       }
 
@@ -1217,6 +1236,25 @@ export default function ScriptTimeline({
           </div>
 
         </div>
+
+        {/* ACOUSTIC SCENE WAVEFORM VISUALIZER TIMELINE */}
+        <AudioWaveformVisualizer
+          segments={project.masterScript}
+          activeSegmentIndex={activeSegmentIndex}
+          setActiveSegmentIndex={setActiveSegmentIndex}
+          selectedVoice={selectedVoice}
+          synthesizedAudio={synthesizedAudio}
+          audioIsPlaying={audioIsPlaying}
+          audioCurrentTime={audioCurrentTime}
+          audioDuration={audioDuration}
+          onSeek={(seconds) => {
+            const audio = audioRef.current;
+            if (audio) {
+              audio.currentTime = seconds;
+              setAudioCurrentTime(seconds);
+            }
+          }}
+        />
 
         {/* VISUAL LOADING STATE & SPEECH CAPTURE STEPS */}
         {isSynthesizing && (
