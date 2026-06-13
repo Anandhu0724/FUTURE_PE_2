@@ -1,0 +1,6 @@
+{
+  "name": "UGC Video Script Generator",
+  "description": "Generates high-converting, authentic 9:16 vertical video ad scripts for UGC creators. Displays interactive smartphone previews, creative direction notes, visual cues, native platform captions, and conversational audio cues.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
