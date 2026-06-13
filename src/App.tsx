@@ -228,8 +228,21 @@ export default function App() {
       });
 
       if (!response.ok) {
-        const errorVal = await response.json();
-        throw new Error(errorVal.error || "Generation unsuccessful");
+        const errorText = await response.text();
+        console.error("Server returned non-JSON error page:", errorText);
+        try {
+          const parsed = JSON.parse(errorText);
+          throw new Error(parsed.error || parsed.details || `Server responded with status ${response.status}`);
+        } catch (_) {
+          throw new Error(`Server responded with status ${response.status}: ${errorText.substring(0, 120)}`);
+        }
+      }
+
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const responseText = await response.text();
+        console.error("Expected JSON but received response body:", responseText);
+        throw new Error(`Invalid payload format (Expected JSON, received ${contentType.slice(0, 30)})`);
       }
 
       const generatedProject: UGCProject = await response.json();
@@ -432,6 +445,12 @@ export default function App() {
               teleprompterSpeed={teleprompterSpeed}
               setTeleprompterSpeed={setTeleprompterSpeed}
               onShareScript={handleShareScript}
+              onUpdateSegments={(newSegments) => {
+                setProject(prev => ({
+                  ...prev,
+                  masterScript: newSegments
+                }));
+              }}
             />
 
             <ScriptAnalytics

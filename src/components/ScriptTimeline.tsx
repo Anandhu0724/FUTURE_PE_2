@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   Play, Pause, ChevronRight, Copy, Check, Info, BadgeAlert, HelpCircle, 
   Eye, Sparkles, Sliders, Share2, Type as TypeIcon, QrCode, Smartphone, ExternalLink,
-  Volume2, RefreshCw, Music, User
+  Volume2, RefreshCw, Music, User, GripVertical
 } from "lucide-react";
 import { Hook, ScriptSegment, UGCProject, CTA } from "../types";
 import AudioWaveformVisualizer from "./AudioWaveformVisualizer";
@@ -16,6 +16,7 @@ interface ScriptTimelineProps {
   teleprompterSpeed: number;
   setTeleprompterSpeed: (speed: number) => void;
   onShareScript: () => string;
+  onUpdateSegments?: (newSegments: ScriptSegment[]) => void;
 }
 
 const VOICES_LIST = [
@@ -95,6 +96,7 @@ export default function ScriptTimeline({
   teleprompterSpeed,
   setTeleprompterSpeed,
   onShareScript,
+  onUpdateSegments,
 }: ScriptTimelineProps) {
   const [activeTab, setActiveTab] = useState<"timeline" | "hooks" | "ctas" | "teleprompter">("timeline");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -102,6 +104,33 @@ export default function ScriptTimeline({
   const [shareSuccess, setShareSuccess] = useState<boolean>(false);
   const [showQRPanel, setShowQRPanel] = useState<boolean>(false);
   const [shareUrl, setShareUrl] = useState<string>("");
+
+  // Drag and drop ordering states
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const reorderSegments = (startIndex: number, endIndex: number) => {
+    if (!onUpdateSegments) return;
+    const result = Array.from(project.masterScript);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    
+    const reindexed = result.map((seg, idx) => ({
+      ...seg,
+      segmentId: idx + 1
+    }));
+    
+    onUpdateSegments(reindexed);
+
+    // Keep active segment index matched during dragging
+    const previouslyActiveId = project.masterScript[activeSegmentIndex]?.segmentId;
+    if (previouslyActiveId !== undefined) {
+      const matchIdx = reindexed.findIndex(s => s.segmentId === previouslyActiveId);
+      if (matchIdx !== -1) {
+        setActiveSegmentIndex(matchIdx);
+      }
+    }
+  };
 
   // Voice Persona Synthesis States
   const [selectedVoice, setSelectedVoice] = useState<string>("Zephyr");
@@ -534,14 +563,51 @@ export default function ScriptTimeline({
                   <div
                     key={segment.segmentId}
                     onClick={() => setActiveSegmentIndex(index)}
-                    className={`border text-left p-4 rounded-none transition-all duration-250 cursor-pointer ${
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.effectAllowed = "move";
+                      e.dataTransfer.setData("text/plain", String(index));
+                      setDraggedIndex(index);
+                    }}
+                    onDragEnd={() => {
+                      setDraggedIndex(null);
+                      setDragOverIndex(null);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (draggedIndex !== null && draggedIndex !== index) {
+                        setDragOverIndex(index);
+                      }
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverIndex === index) {
+                        setDragOverIndex(null);
+                      }
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const sourceIndex = Number(e.dataTransfer.getData("text/plain"));
+                      if (!isNaN(sourceIndex) && sourceIndex !== index) {
+                        reorderSegments(sourceIndex, index);
+                      }
+                      setDraggedIndex(null);
+                      setDragOverIndex(null);
+                    }}
+                    className={`border text-left p-4 rounded-none transition-all duration-250 cursor-pointer relative ${
                       index === activeSegmentIndex
                         ? "bg-[#F1EFEC] border-black text-[#1A1A1A] shadow-xs"
                         : "bg-white border-black/10 hover:border-black/20 text-[#1A1A1A]"
+                    } ${
+                      draggedIndex === index ? "opacity-35 border-dashed border-zinc-400 bg-zinc-50/50" : ""
+                    } ${
+                      dragOverIndex === index ? "border-t-[3px] border-t-red-650 bg-red-500/5" : ""
                     }`}
                   >
                     <div className="flex items-center justify-between mb-3.5 border-b border-black/5 pb-2">
                       <div className="flex items-center gap-2">
+                        <div className="cursor-grab active:cursor-grabbing text-zinc-400 hover:text-black p-0.5" title="Drag to reorder scenes">
+                          <GripVertical className="w-3.5 h-3.5" />
+                        </div>
                         <span className="w-6 h-6 rounded-none bg-black text-white font-mono text-xs flex items-center justify-center font-bold">
                           {segment.segmentId}
                         </span>
