@@ -2,7 +2,6 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 import { GoogleGenAI, Type } from "@google/genai";
-import { createServer as createViteServer } from "vite";
 
 dotenv.config();
 
@@ -11,18 +10,31 @@ app.use(express.json());
 
 const PORT = 3000;
 
-// Initialize Google GenAI
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY || "",
-  httpOptions: {
-    headers: {
-      "User-Agent": "aistudio-build",
-    },
-  },
-});
+// Lazy Initialize Google GenAI
+let aiClient: GoogleGenAI | null = null;
+function getAiClient(): GoogleGenAI {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing required GEMINI_API_KEY configuration on host environment.");
+  }
+  if (!aiClient) {
+    aiClient = new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          "User-Agent": "aistudio-build",
+        },
+      },
+    });
+  }
+  return aiClient;
+}
 
 // Primary generation route
 app.post("/api/generate-script", async (req, res) => {
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({ error: "Missing required API configurations on host environment." });
+  }
   try {
     const {
       appName,
@@ -40,7 +52,7 @@ app.post("/api/generate-script", async (req, res) => {
 
     const systemInstruction = `You are a legendary Direct-to-Consumer (D2C) Copywriter, UGC Creative Director, and video conversion optimizer. 
 Your specialty is writing native, hyper-authentic 9:16 vertical video ad scripts that completely avoid corporate "marketing speak" or traditional commercial tropes.
-The script must sound exactly like a real smartphone video recorded in one take by an everyday person sharing a life-changing realization with a friend. 
+The script must sound exactly like a real smartphone video recorded in one take by everyday person sharing a life-changing realization with a friend. 
 Include natural conversational filler words (honestly, literally, so yeah, basically, game-changer, I was like, etc.) and organic pauses.
 Tone should be: ${creatorTone}. Pacing should be: ${creatorPacing}.
 
@@ -67,7 +79,7 @@ Provide the output strictly in the requested JSON structure.`;
 
     const userPrompt = `Generate a high-converting UGC vertical script project for the app "${appName}" targeting "${targetAudience}".`;
 
-    const response = await ai.models.generateContent({
+    const response = await getAiClient().models.generateContent({
       model: "gemini-3.5-flash",
       contents: userPrompt,
       config: {
@@ -188,6 +200,9 @@ function createWavHeaderAndAppendPCM(pcmBuffer: Buffer, sampleRate: number = 240
 
 // Backend text-to-speech synthesis route
 app.post("/api/generate-voice", async (req, res) => {
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({ error: "Missing required API configurations on host environment." });
+  }
   res.setHeader("Content-Type", "application/json");
   try {
     const { text, voiceName = "Zephyr" } = req.body;
@@ -196,13 +211,6 @@ app.post("/api/generate-voice", async (req, res) => {
       return res.status(400).json({ 
         error: "Missing required speech text content",
         details: "Please provide a valid text string to generate speech audio." 
-      });
-    }
-
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(400).json({ 
-        error: "Gemini API Key is missing",
-        details: "Please configure your GEMINI_API_KEY in Settings > Secrets." 
       });
     }
 
@@ -216,7 +224,7 @@ app.post("/api/generate-voice", async (req, res) => {
       });
     }
 
-    const response = await ai.models.generateContent({
+    const response = await getAiClient().models.generateContent({
       model: "gemini-3.1-flash-tts-preview",
       contents: [{ parts: [{ text: cleanText }] }],
       config: {
@@ -258,6 +266,7 @@ app.post("/api/generate-voice", async (req, res) => {
 // Configure Vite middleware in dev or static files in production
 async function configureApp() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -276,7 +285,7 @@ async function configureApp() {
   });
 }
 
-if (!process.env.NETLIFY) {
+if (!process.env.NETLIFY && !process.env.VERCEL) {
   configureApp();
 }
 

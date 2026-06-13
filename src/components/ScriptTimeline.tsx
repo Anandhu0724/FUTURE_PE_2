@@ -433,7 +433,7 @@ export default function ScriptTimeline({
 
       {/* MOBILE COLLABORATION & QR CODE TELEPROMPTER PANEL */}
       {showQRPanel && shareUrl && (
-        <div className="bg-[#FAF9F6] border-2 border-black/85 p-4 sm:p-5 rounded-none flex flex-col md:flex-row gap-5 items-stretch text-left animate-fade-in relative shadow-sm">
+        <div className="w-full max-w-full overflow-hidden bg-[#FAF9F6] border-2 border-black/85 p-4 sm:p-5 rounded-none flex flex-col md:flex-row gap-5 items-stretch text-left animate-fade-in relative shadow-sm">
           <button
             onClick={() => setShowQRPanel(false)}
             className="absolute top-4 right-4 text-xs font-sans text-zinc-500 hover:text-black font-extrabold uppercase tracking-wider cursor-pointer"
@@ -468,7 +468,7 @@ export default function ScriptTimeline({
           </div>
 
           {/* RIGHT COLUMN: INTERACTIVE HUD GUIDE & SPEED CONTROLS */}
-          <div className="flex-1 flex flex-col justify-between font-sans">
+          <div className="flex-1 min-w-0 flex flex-col justify-between font-sans">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <QrCode className="w-4 h-4 text-black" />
@@ -506,9 +506,9 @@ export default function ScriptTimeline({
             </div>
 
             {/* LIVE SHARE LINK REFERENCE */}
-            <div className="mt-4 pt-3 border-t border-black/5 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div className="flex-1 bg-[#F1EFEC] px-3 py-2 rounded-none border border-black/5 flex items-center justify-between gap-2 overflow-hidden">
-                <span className="text-[10px] font-mono text-zinc-500 overflow-ellipsis whitespace-nowrap overflow-hidden pr-3">
+            <div className="mt-4 pt-3 border-t border-black/5 flex flex-col sm:flex-row sm:items-center gap-2 w-full min-w-0 overflow-hidden">
+              <div className="flex-1 min-w-0 bg-[#F1EFEC] px-3 py-2 rounded-none border border-black/5 flex items-center justify-between gap-2 overflow-hidden">
+                <span className="text-[10px] font-mono text-zinc-500 overflow-ellipsis whitespace-nowrap overflow-hidden pr-3 select-all">
                   {shareUrl}
                 </span>
                 <button
@@ -697,7 +697,7 @@ export default function ScriptTimeline({
               {/* SIDE-CAR PREVIEW COMPANION CARD & QUICK GEN TRIGGER - 4 columns */}
               <div className="xl:col-span-4 bg-white border-2 border-black p-4 flex flex-col gap-4 text-left font-sans shadow-xs">
                 {/* Header */}
-                <div className="border-b border-black/10 pb-3">
+                <div className="border-b border-black/10 pb-3 w-[358px]">
                   <span className="text-[8px] uppercase tracking-[0.2em] text-[#8B0000] font-sans font-extrabold px-1.5 py-0.5 bg-[#8B0000]/5 border border-[#8B0000]/10 inline-block mb-1">
                     🎙️ AI Voice Workspace
                   </span>

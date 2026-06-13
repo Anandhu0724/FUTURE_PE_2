@@ -498,7 +498,7 @@ export default function App() {
       </main>
 
       {/* DETAILED BOTTOM EDUCATIONAL FOOTER */}
-      <footer className="border-t border-black/15 bg-white py-8 mt-12 select-none text-left">
+      <footer className="border-t border-black/15 bg-white pt-[31px] pb-[33px] w-[833.667px] mx-auto mt-12 select-none text-left">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-xs text-zinc-650 font-sans">
             <div>

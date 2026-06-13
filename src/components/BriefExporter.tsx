@@ -10,6 +10,51 @@ interface BriefExporterProps {
 
 export default function BriefExporter({ project, activeHook, onExport }: BriefExporterProps) {
   const [copied, setCopied] = useState(false);
+  const [copiedScript, setCopiedScript] = useState(false);
+
+  // Generate script segments only in clear readable text block
+  const generateSocialScriptText = () => {
+    const totalDuration = project.masterScript.reduce((acc, s) => acc + s.duration, 0);
+    
+    const scenesText = project.masterScript.map((segment) => { // Map segments cleanly
+      return `🎬 SCENE ${segment.segmentId}: ${segment.segmentName} (${segment.duration}s)
+🎥 ACTION/VISUAL: ${segment.visualCue}
+🗣️ DIALOGUE: "${segment.audioLine}"
+📱 CAPTION: ✨ ${segment.textOverlay}`;
+    }).join("\n\n");
+
+    return `🎥 UGC VIDEO SCRIPT 🎥
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⏱️ EST. DURATION: ~${totalDuration}s
+
+🪝 ACTIVE HOOK STYLE: ${activeHook.type}
+🗣️ HOOK DIALOGUE: "${activeHook.audioLine}"
+📱 HOOK CAPTION: ✨ ${activeHook.textOverlay}
+🎥 HOOK VISUAL: ${activeHook.visualCue}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📺 SCENE-BY-SCENE STORYBOARD:
+
+${scenesText}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📣 CALL TO ACTION (CTA) OPTIONS:
+${project.ctas.map((cta, idx) => `
+👉 Option ${idx + 1} (${cta.style}):
+🗣️ Spoken: "${cta.spokenCta}"
+📱 Caption: "${cta.textOverlay}"
+🖱️ Button: "${cta.phrase}"`).join("\n")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Generated via UGC Script Workbench`;
+  };
+
+  const handleCopyScriptOnly = () => {
+    navigator.clipboard.writeText(generateSocialScriptText());
+    setCopiedScript(true);
+    if (onExport) onExport();
+    setTimeout(() => setCopiedScript(false), 2000);
+  };
 
   // Generate the formatted Markdown brief text block
   const generateMarkdownBrief = () => {
@@ -291,6 +336,22 @@ ${project.ctas.map((cta, idx) => {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <button
+            onClick={handleCopyScriptOnly}
+            className="px-3 py-1.5 bg-[#FAF9F6] border border-black hover:bg-black hover:text-white text-zinc-900 rounded-none text-[10px] tracking-wider uppercase font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+            title="Copy clean script and active captions optimized for social media and messaging"
+          >
+            {copiedScript ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-600 font-bold" /> Script Copied!
+              </>
+            ) : (
+              <>
+                <ClipboardSignature className="w-3.5 h-3.5 text-zinc-700" /> Copy Script to Clipboard
+              </>
+            )}
+          </button>
+
           <button
             onClick={handleCopyText}
             className="px-3 py-1.5 bg-[#F1EFEC] hover:bg-black hover:text-white text-zinc-800 rounded-none text-[10px] tracking-wider uppercase font-bold transition-all border border-black/10 flex items-center gap-1.5 cursor-pointer"

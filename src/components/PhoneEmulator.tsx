@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Play, Pause, RotateCcw, Volume2, Heart, MessageCircle, Share2, Sparkles, UserCheck } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { ScriptSegment, UGCProject } from "../types";
 
 interface PhoneEmulatorProps {
@@ -222,90 +223,111 @@ export default function PhoneEmulator({
           )}
 
           {/* Actor Speech Indicator Card */}
-          <div className="absolute top-12 left-3 right-3 bg-white/95 backdrop-blur-md rounded-none p-3 border border-black/20 flex items-center gap-2.5 z-10 animate-fade-in">
-            <div className="p-1.5 bg-black text-white rounded-none">
-              <Volume2 className="w-3.5 h-3.5 animate-pulse" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[8px] text-zinc-500 uppercase tracking-widest font-sans font-bold">CREATIVE DIRECTION</p>
-              <p className="text-[11px] text-[#1A1A1A] line-clamp-2 italic leading-relaxed font-serif mt-0.5">
-                "{activeSegment?.visualCue || "No current directions"}"
-              </p>
-            </div>
+          <div className="absolute top-12 left-3 right-3 z-10 select-none">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSegmentIndex}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white/95 backdrop-blur-md rounded-none p-3 border border-black/20 flex items-center gap-2.5 shadow-xs"
+              >
+                <div className="p-1.5 bg-black text-white rounded-none">
+                  <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[8px] text-zinc-500 uppercase tracking-widest font-sans font-bold">CREATIVE DIRECTION</p>
+                  <p className="text-[11px] text-[#1A1A1A] line-clamp-2 italic leading-relaxed font-serif mt-0.5">
+                    "{activeSegment?.visualCue || "No current directions"}"
+                  </p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* SIMULATED CREATOR AVATAR STAGE (Selfie framing) */}
-          <div className="flex-1 flex flex-col items-center justify-center relative mt-12 z-0">
-            
-            {/* Soft decorative ring light effect glowing behind avatar */}
-            <div className={`absolute w-36 h-36 rounded-none blur-[45px] opacity-25 mix-blend-screen transition-colors duration-1000 ${
-              isPlaying ? "bg-amber-100 animate-pulse" : "bg-neutral-800"
-            }`}></div>
+          <div className="flex-1 flex flex-col items-center justify-center relative mt-12 z-0 w-full overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSegmentIndex}
+                initial={{ opacity: 0, x: 40, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -40, scale: 0.95 }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className="flex flex-col items-center justify-center w-full"
+              >
+                {/* Soft decorative ring light effect glowing behind avatar */}
+                <div className={`absolute w-36 h-36 rounded-none blur-[45px] opacity-25 mix-blend-screen transition-colors duration-1000 ${
+                  isPlaying ? "bg-amber-100 animate-pulse" : "bg-neutral-800"
+                }`}></div>
 
-            {/* Speaking Creator Avatar Illustration */}
-            <div className="relative">
-              <svg width="115" height="115" viewBox="0 0 100 100" className="drop-shadow-md">
-                {/* Hoodie / Shoulders */}
-                <path d="M15,95 Q15,75 35,65 L65,65 Q85,75 85,95 Z" fill="#2d3748" className="transition-all duration-500 stroke-zinc-700 stroke-[1.5px]" />
-                <path d="M40,65 L50,85 L60,65 Z" fill="#1a202c" />
-                
-                {/* Head / Neck */}
-                <rect x="44" y="52" width="12" height="18" fill="#fbd38d" rx="2" />
-                <circle cx="50" cy="40" r="22" fill="#fbd38d" />
+                {/* Speaking Creator Avatar Illustration */}
+                <div className="relative">
+                  <svg width="115" height="115" viewBox="0 0 100 100" className="drop-shadow-md">
+                    {/* Hoodie / Shoulders */}
+                    <path d="M15,95 Q15,75 35,65 L65,65 Q85,75 85,95 Z" fill="#2d3748" className="transition-all duration-500 stroke-zinc-700 stroke-[1.5px]" />
+                    <path d="M40,65 L50,85 L60,65 Z" fill="#1a202c" />
+                    
+                    {/* Head / Neck */}
+                    <rect x="44" y="52" width="12" height="18" fill="#fbd38d" rx="2" />
+                    <circle cx="50" cy="40" r="22" fill="#fbd38d" />
 
-                {/* Face Features: Blush circles */}
-                <circle cx="36" cy="43" r="3" fill="#feb2b2" opacity="0.6" />
-                <circle cx="64" cy="43" r="3" fill="#feb2b2" opacity="0.6" />
+                    {/* Face Features: Blush circles */}
+                    <circle cx="36" cy="43" r="3" fill="#feb2b2" opacity="0.6" />
+                    <circle cx="64" cy="43" r="3" fill="#feb2b2" opacity="0.6" />
 
-                {/* Eyes - blink or narrow according to vibe */}
-                {isPlaying ? (
-                  <>
-                    <path d="M33,37 Q37,35 41,37" fill="none" stroke="#1a202c" strokeWidth="2.5" strokeLinecap="round" />
-                    <path d="M59,37 Q63,35 67,37" fill="none" stroke="#1a202c" strokeWidth="2.5" strokeLinecap="round" />
-                  </>
-                ) : (
-                  <>
-                    <circle cx="37" cy="37" r="2.5" fill="#1a202c" />
-                    <circle cx="63" cy="37" r="2.5" fill="#1a202c" />
-                  </>
-                )}
+                    {/* Eyes - blink or narrow according to vibe */}
+                    {isPlaying ? (
+                      <>
+                        <path d="M33,37 Q37,35 41,37" fill="none" stroke="#1a202c" strokeWidth="2.5" strokeLinecap="round" />
+                        <path d="M59,37 Q63,35 67,37" fill="none" stroke="#1a202c" strokeWidth="2.5" strokeLinecap="round" />
+                      </>
+                    ) : (
+                      <>
+                        <circle cx="37" cy="37" r="2.5" fill="#1a202c" />
+                        <circle cx="63" cy="37" r="2.5" fill="#1a202c" />
+                      </>
+                    )}
 
-                {/* Dynamic animated speech mouth */}
-                <rect 
-                  x={50 - 4} 
-                  y={46} 
-                  width="8" 
-                  height={mouthY} 
-                  fill="#742a2a" 
-                  rx="4" 
-                  className="transition-all duration-100" 
-                />
+                    {/* Dynamic animated speech mouth */}
+                    <rect 
+                      x={50 - 4} 
+                      y={46} 
+                      width="8" 
+                      height={mouthY} 
+                      fill="#742a2a" 
+                      rx="4" 
+                      className="transition-all duration-100" 
+                    />
 
-                {/* Simple Casual Hair / Accessories based on presets */}
-                <path d="M28,40 Q50,15 72,40 Q50,22 28,40 Z" fill="#4a5568" />
-                
-                {/* Simulated Smartphone held in hand (if POV / Secret Weapon frame) */}
-                {activeSegment?.segmentName?.toLowerCase().includes("demo") || activeSegment?.segmentName?.toLowerCase().includes("feature") ? (
-                  <g className="animate-bounce" style={{ animationDuration: '3s' }}>
-                    <rect x="68" y="70" width="16" height="26" rx="2" fill="#1a2530" stroke="#ffd700" strokeWidth="1" />
-                    <rect x="70" y="72" width="12" height="20" rx="1" fill="#4dabf7" />
-                    {/* Hand holder */}
-                    <circle cx="73" cy="85" r="4" fill="#fbd38d" />
-                  </g>
-                ) : null}
-              </svg>
+                    {/* Simple Casual Hair / Accessories based on presets */}
+                    <path d="M28,40 Q50,15 72,40 Q50,22 28,40 Z" fill="#4a5568" />
+                    
+                    {/* Simulated Smartphone held in hand (if POV / Secret Weapon frame) */}
+                    {activeSegment?.segmentName?.toLowerCase().includes("demo") || activeSegment?.segmentName?.toLowerCase().includes("feature") ? (
+                      <g className="animate-bounce" style={{ animationDuration: '3s' }}>
+                        <rect x="68" y="70" width="16" height="26" rx="2" fill="#1a2530" stroke="#ffd700" strokeWidth="1" />
+                        <rect x="70" y="72" width="12" height="20" rx="1" fill="#4dabf7" />
+                        {/* Hand holder */}
+                        <circle cx="73" cy="85" r="4" fill="#fbd38d" />
+                      </g>
+                    ) : null}
+                  </svg>
 
-              {/* RECORDING RED DOT BAR */}
-              <div className="absolute -top-3 -right-3 px-2 py-0.5 bg-red-650 rounded-none flex items-center gap-1 animate-pulse z-10 border border-white/20 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
-                <span className="text-[7px] text-white font-mono font-bold uppercase tracking-wider">REC</span>
-              </div>
-            </div>
+                  {/* RECORDING RED DOT BAR */}
+                  <div className="absolute -top-3 -right-3 px-2 py-0.5 bg-red-650 rounded-none flex items-center gap-1 animate-pulse z-10 border border-white/20 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                    <span className="text-[7px] text-white font-mono font-bold uppercase tracking-wider">REC</span>
+                  </div>
+                </div>
 
-            {/* Creator Description Badge */}
-            <div className="mt-4 px-3 py-1 bg-[#F1EFEC]/95 backdrop-blur-sm border border-black/10 rounded-none text-[9px] text-[#1A1A1A] font-sans font-bold uppercase tracking-widest max-w-[170px] text-center select-none shadow-xs">
-              📷 {project.creatorDirectives.vibeDescription.split('.')[0] || "UGC Smartphone Vibe"}
-            </div>
+                {/* Creator Description Badge */}
+                <div className="mt-4 px-3 py-1 bg-[#F1EFEC]/95 backdrop-blur-sm border border-black/10 rounded-none text-[9px] text-[#1A1A1A] font-sans font-bold uppercase tracking-widest max-w-[170px] text-center select-none shadow-xs">
+                  📷 {project.creatorDirectives.vibeDescription.split('.')[0] || "UGC Smartphone Vibe"}
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* DYNAMIC TIKTOK OVERLAY PANEL (Right margin icons) */}
@@ -344,22 +366,39 @@ export default function PhoneEmulator({
           </div>
 
           {/* NATIVE ON-SCREEN CAPTION LAYER (Centered near bottom-third) */}
-          <div className="px-3 min-h-[90px] flex items-center justify-center text-center z-10 my-10 select-none">
-            {activeSegment?.textOverlay ? (
-              <div className="transform scale-102 transition-transform duration-200">
-                {/* High Contrast Tik-Tok Style Pill Text using Signature yellow block overlay exactly as design */}
-                <div className="inline-block bg-[#FEE21E] text-black px-4 py-2 font-serif font-extrabold text-sm uppercase italic tracking-tight border-2 border-black shadow-xs">
-                  "{activeSegment.textOverlay}"
-                </div>
-                <div>
-                  <p className="text-[8px] text-zinc-400 font-sans tracking-widest font-bold uppercase mt-2.5 bg-black/45 py-0.5 px-2 rounded-none border border-white/5 inline-block">
-                    💬 ACTIVE CAPTION
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <p className="text-zinc-400 text-xs italic font-serif">Play preview to view native overlay...</p>
-            )}
+          <div className="px-3 min-h-[90px] flex items-center justify-center text-center z-10 my-10 select-none w-full">
+            <AnimatePresence mode="wait">
+              {activeSegment?.textOverlay ? (
+                <motion.div
+                  key={activeSegmentIndex}
+                  initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1.02 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="transform scale-102 transition-transform duration-200"
+                >
+                  {/* High Contrast Tik-Tok Style Pill Text using Signature yellow block overlay exactly as design */}
+                  <div className="inline-block bg-[#FEE21E] text-black px-4 py-2 font-serif font-extrabold text-sm uppercase italic tracking-tight border-2 border-black shadow-xs">
+                    "{activeSegment.textOverlay}"
+                  </div>
+                  <div>
+                    <p className="text-[8px] text-zinc-400 font-sans tracking-widest font-bold uppercase mt-2.5 bg-black/45 py-0.5 px-2 rounded-none border border-white/5 inline-block">
+                      💬 ACTIVE CAPTION
+                    </p>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.p
+                  key="empty-caption"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-zinc-400 text-xs italic font-serif"
+                >
+                  Play preview to view native overlay...
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* CREATOR IDENTIFIER & MUSIC BOX (Simulated Social Footer info) */}
@@ -372,9 +411,20 @@ export default function PhoneEmulator({
             </div>
             
             {/* UGC Audio script line transcript ticker preview - shows current paragraph */}
-            <p className="text-zinc-200 text-[11px] leading-relaxed line-clamp-2 select-none font-serif italic">
-              "{activeSegment?.audioLine || "Preparing audio file directions..."}"
-            </p>
+            <div className="min-h-[36px] flex flex-col justify-start">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={activeSegmentIndex}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="text-zinc-200 text-[11px] leading-relaxed line-clamp-2 select-none font-serif italic"
+                >
+                  "{activeSegment?.audioLine || "Preparing audio file directions..."}"
+                </motion.p>
+              </AnimatePresence>
+            </div>
 
             {/* Audio Scrolling Bar */}
             <div className="flex items-center gap-1 text-[8px] text-zinc-400 mt-1.5 font-sans whitespace-nowrap overflow-hidden">
