@@ -260,10 +260,9 @@ app.post("/api/generate-voice", async (req, res) => {
     const wavBuffer = createWavHeaderAndAppendPCM(pcmBuffer, 24000);
     const wavBase64 = wavBuffer.toString("base64");
 
-    res.json({
+    res.status(200).json({
       success: true,
-      audioBase64: wavBase64,
-      voiceName,
+      audioData: wavBase64,
     });
   } catch (err: any) {
     console.error("Text-to-speech generation failure:", err);
