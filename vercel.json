@@ -8,6 +8,10 @@
   },
   "rewrites": [
     {
+      "source": "/api/generate-voice",
+      "destination": "/api/generate-voice.ts"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/index.ts"
     }
