@@ -14,7 +14,7 @@
 ### 📡 Master Product Walkthrough
 Experience the automated workspace configuration, creative brief calculations, real-time wave pacing, and one-click media download pipelines in action:
 
-👉 [**Watch the Google Drive Project Walkthrough Video**](https://drive.google.com/file/d/d2c_ugc_app_walkthrough_prod/view)
+👉 [**Watch the Google Drive Project Walkthrough Video**](https://drive.google.com/file/d/1WivlLNQV9snBaaDpLzvxB-HnmKn-i_uw/view?usp=sharing)
 
 ---
 
