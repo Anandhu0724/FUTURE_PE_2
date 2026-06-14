@@ -209,7 +209,10 @@ function createWavHeaderAndAppendPCM(pcmBuffer: Buffer, sampleRate: number = 240
 // Backend text-to-speech synthesis route
 app.post("/api/generate-voice", async (req, res) => {
   if (!process.env.GEMINI_API_KEY) {
-    return res.status(500).json({ error: "Missing required API configurations on host environment." });
+    return res.status(500).json({ 
+      error: "Configuration Error", 
+      details: "GEMINI_API_KEY is not defined in the hosting environment variables." 
+    });
   }
   res.setHeader("Content-Type", "application/json");
   try {
