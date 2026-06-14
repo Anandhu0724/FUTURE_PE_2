@@ -3,14 +3,6 @@ import path from "path";
 import dotenv from "dotenv";
 import { GoogleGenAI, Type } from "@google/genai";
 
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "reason:", reason);
-});
-
-process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception thrown:", err);
-});
-
 dotenv.config();
 
 const app = express();
@@ -209,10 +201,7 @@ function createWavHeaderAndAppendPCM(pcmBuffer: Buffer, sampleRate: number = 240
 // Backend text-to-speech synthesis route
 app.post("/api/generate-voice", async (req, res) => {
   if (!process.env.GEMINI_API_KEY) {
-    return res.status(500).json({ 
-      error: "Configuration Error", 
-      details: "GEMINI_API_KEY is not defined in the hosting environment variables." 
-    });
+    return res.status(500).json({ error: "Missing required API configurations on host environment." });
   }
   res.setHeader("Content-Type", "application/json");
   try {
@@ -260,9 +249,10 @@ app.post("/api/generate-voice", async (req, res) => {
     const wavBuffer = createWavHeaderAndAppendPCM(pcmBuffer, 24000);
     const wavBase64 = wavBuffer.toString("base64");
 
-    res.status(200).json({
+    res.json({
       success: true,
-      audioData: wavBase64,
+      audioBase64: wavBase64,
+      voiceName,
     });
   } catch (err: any) {
     console.error("Text-to-speech generation failure:", err);

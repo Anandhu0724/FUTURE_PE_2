@@ -1,19 +1,14 @@
 {
   "version": 2,
   "functions": {
-    "api/index.ts": {
+    "api/**/*.ts": {
       "memory": 1024,
       "maxDuration": 60
     }
   },
-  "rewrites": [
-    {
-      "source": "/api/generate-voice",
-      "destination": "/api/generate-voice.ts"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.ts"
-    }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

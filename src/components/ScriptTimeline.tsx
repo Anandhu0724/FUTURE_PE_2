@@ -274,7 +274,7 @@ export default function ScriptTimeline({
         throw new Error(data.error || "Synthesis was unsuccessful.");
       }
 
-      setSynthesizedAudio(`data:audio/wav;base64,${data.audioData}`);
+      setSynthesizedAudio(`data:audio/wav;base64,${data.audioBase64}`);
     } catch (err: any) {
       console.error("Failed voice synthesizer", err);
       setSynthesisError(err.message || "Synthesis failed. Please verify secret credentials & try again.");
