@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Sparkles, RefreshCw, Smartphone, CheckSquare, ListVideo, BadgeAlert, Clapperboard, HelpCircle } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Sparkles, RefreshCw, Smartphone, CheckSquare, ListVideo, BadgeAlert, Clapperboard, HelpCircle, Sun, Moon } from "lucide-react";
 import { PRESET_BRIEFS } from "./data";
 import { Hook, UGCProject, PresetBrief } from "./types";
 import PhoneEmulator from "./components/PhoneEmulator";
@@ -67,6 +67,20 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [alertSuccess, setAlertSuccess] = useState<boolean>(false);
   const [sharedLoadedMessage, setSharedLoadedMessage] = useState<string | null>(null);
+  const [showAntigravityToast, setShowAntigravityToast] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem("ugc_dark_mode");
+    return saved === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("ugc_dark_mode", String(isDarkMode));
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
 
   // Lifted Teleprompter State initialized from cache or url sharing config
   const [teleprompterSpeed, setTeleprompterSpeed] = useState<number>(() => {
@@ -113,6 +127,39 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("ugc_teleprompter_speed", String(teleprompterSpeed));
   }, [teleprompterSpeed]);
+
+  // Hidden Developer Easter Egg: Trigger on 'antigravity' keystroke
+  const antigravityBufferRef = useRef<string>("");
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key && e.key.length === 1) {
+        antigravityBufferRef.current = (antigravityBufferRef.current + e.key.toLowerCase()).slice(-20);
+        if (antigravityBufferRef.current.includes("antigravity")) {
+          // Reset buffer
+          antigravityBufferRef.current = "";
+          
+          // Trigger toast state
+          setShowAntigravityToast(true);
+          
+          // Perform clean window intercept action
+          setTimeout(() => {
+            window.open("https://xkcd.com/353/", "_blank");
+          }, 1000);
+
+          // Hide toast after some time
+          setTimeout(() => {
+            setShowAntigravityToast(false);
+          }, 6000);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   // User Activity Tracking
   const [activity, setActivity] = useState<UserActivity>(() => {
@@ -308,11 +355,35 @@ export default function App() {
   return (
     <div className="bg-[#FAF9F6] text-[#1A1A1A] min-h-screen font-serif flex flex-col justify-between selection:bg-black selection:text-white antialiased">
       
+      {/* Hidden Antigravity Easter Egg Toast */}
+      {showAntigravityToast && (
+        <div id="antigravity-toast" className="fixed top-24 right-6 z-50 animate-bounce bg-black text-white p-4 max-w-sm shadow-2xl font-mono text-xs border border-zinc-800 flex flex-col gap-2 rounded-none transition-all duration-300">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">🚀</span>
+            <span className="font-bold tracking-tight text-white">Resetting gravity parameters...</span>
+          </div>
+          <p className="text-zinc-400 text-[11px] leading-relaxed">
+            import antigravity successful.
+          </p>
+          <div className="flex items-center justify-between border-t border-zinc-800 pt-2 mt-1 gap-4">
+            <span className="text-[10px] text-emerald-400 font-sans tracking-wide font-bold">Launching XKCD 353 comic...</span>
+            <a 
+              href="https://xkcd.com/353/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-[10px] uppercase font-bold text-sky-400 hover:text-sky-300 underline cursor-pointer"
+            >
+              Manual Fly ↗
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* EDITORIAL HEADER */}
-      <header className="border-b border-black/10 bg-[#FAF9F6] sticky top-0 z-40 select-none">
+      <header className="border-b border-black/10 dark:border-white/10 bg-[#FAF9F6] dark:bg-[#0E0E0D] sticky top-0 z-40 select-none transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3.5">
-            <div className="p-2 bg-[#1A1A1A] text-white rounded-none">
+            <div className="p-2 bg-[#1A1A1A] dark:bg-[#FAF9F6] text-white dark:text-[#0E0E0D] rounded-none">
               <Clapperboard className="w-5 h-5" />
             </div>
             <div>
@@ -320,23 +391,43 @@ export default function App() {
                 <span className="text-[10px] uppercase tracking-[0.25em] font-sans font-bold opacity-60">
                   UGC Creative Direction
                 </span>
-                <span className="text-[9px] font-mono border border-black/15 text-[#1A1A1A] px-1.5 py-0.2 rounded-none bg-white font-bold">
+                <span className="text-[9px] font-mono border border-black/15 dark:border-white/15 text-[#1A1A1A] dark:text-[#F3F1EC] px-1.5 py-0.2 rounded-none bg-white dark:bg-[#1C1C1B] font-bold">
                   v2.4
                 </span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-serif tracking-tight mt-0.5 text-[#1A1A1A]">
+              <h1 className="text-xl sm:text-2xl font-serif tracking-tight mt-0.5 text-[#1A1A1A] dark:text-[#F3F1EC]">
                 Campaign Generator: <span className="italic font-light">"The Smartphone Method"</span>
               </h1>
             </div>
           </div>
 
-          {/* Sizing Indicator metrics to look highly crafted & professional */}
-          <div className="flex items-center gap-4 text-xs font-sans font-bold uppercase tracking-widest text-[#1A1A1A]">
-            <div className="hidden md:flex items-center gap-1.5 bg-white border border-black/10 px-3 py-1.5 rounded-none text-[10px]">
+          {/* Sizing Indicator metrics with theme toggler */}
+          <div className="flex items-center gap-3.5 text-xs font-sans font-bold uppercase tracking-widest text-[#1A1A1A]">
+            <button
+              onClick={() => setIsDarkMode(prev => !prev)}
+              className="flex items-center gap-1.5 bg-white dark:bg-[#1C1C1B] border border-black/10 dark:border-white/10 px-3 py-1.5 text-[10px] hover:bg-[#F1EFEC] dark:hover:bg-[#2D2D2C] transition-all cursor-pointer rounded-none uppercase font-bold text-[#1A1A1A] dark:text-[#F3F1EC]"
+              id="theme-toggler"
+              title="Toggle theme mode"
+            >
+              {isDarkMode ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span>LIGHT MODE</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>DARK MODE</span>
+                </>
+              )}
+            </button>
+
+            <div className="hidden md:flex items-center gap-1.5 bg-white dark:bg-[#1C1C1B] border border-black/10 dark:border-white/10 px-3 py-1.5 rounded-none text-[10px] text-[#1A1A1A] dark:text-[#F3F1EC]">
               <span className="w-2 h-2 rounded-full bg-red-650 animate-pulse"></span>
               ● Live Preview
             </div>
-            <div className="hidden lg:block text-[10px] bg-black text-white p-1.5 px-3.5 rounded-none font-sans font-extrabold">
+
+            <div className="hidden lg:block text-[10px] bg-black dark:bg-[#F3F1EC] text-white dark:text-[#0E0E0D] p-1.5 px-3.5 rounded-none font-sans font-extrabold pb-1.5 pt-1.5 select-none">
               🎯 45s OPTIMAL
             </div>
           </div>

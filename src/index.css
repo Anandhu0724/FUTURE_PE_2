@@ -7,6 +7,171 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+@variant dark (.dark &);
+
+/* -------------------------------------------------------------------------- */
+/* HIGH-CONTRAST LATE-NIGHT DARK MODE EDITORIAL OVERRIDES                     */
+/* -------------------------------------------------------------------------- */
+
+.dark, .dark body {
+  background-color: #0E0E0D !important;
+  color: #F3F1EC !important;
+  color-scheme: dark;
+}
+
+/* Root containers */
+.dark div.bg-[#FAF9F6] {
+  background-color: #0E0E0D !important;
+}
+
+/* Text elements */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: #F3F1EC !important;
+}
+
+.dark p, .dark span:not(.text-white):not(.text-red-650):not(.text-emerald-400), .dark div:not(.bg-white):not(.text-white) {
+  /* Let text elements automatically inherit color or map soft white */
+}
+
+/* Base Utility Overrides */
+.dark .text-[#1A1A1A] {
+  color: #F3F1EC !important;
+}
+
+.dark .text-black {
+  color: #F3F1EC !important;
+}
+
+.dark .text-zinc-650 {
+  color: #ACACA8 !important;
+}
+
+.dark .text-zinc-550 {
+  color: #9C9C98 !important;
+}
+
+.dark .text-zinc-600 {
+  color: #9C9C98 !important;
+}
+
+.dark .text-zinc-700 {
+  color: #C0C0BC !important;
+}
+
+.dark .text-zinc-805 {
+  color: #E6E6E2 !important;
+}
+
+/* Card & Background panels */
+.dark .bg-white {
+  background-color: #171716 !important;
+}
+
+.dark .bg-[#F1EFEC] {
+  background-color: #242423 !important;
+}
+
+.dark .bg-[#FAF9F6]/50 {
+  background-color: rgba(22, 22, 21, 0.45) !important;
+}
+
+.dark .bg-[#FAF9F6] {
+  background-color: #0D0D0C !important;
+}
+
+/* Interactive item hover overrides */
+.dark .hover\:bg-\[\#F1EFEC\]:hover {
+  background-color: #2D2D2C !important;
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: #232322 !important;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: #292928 !important;
+}
+
+/* Form inputs & interactive fields */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1E1E1D !important;
+  color: #F3F1EC !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #F3F1EC !important;
+  outline: none;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #6C6C68 !important;
+}
+
+/* Custom Scrollbars */
+.dark *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.dark *::-webkit-scrollbar-track {
+  background: #111110 !important;
+}
+.dark *::-webkit-scrollbar-thumb {
+  background: #3C3C3B !important;
+  border-radius: 0px !important;
+}
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: #4A4A49 !important;
+}
+
+/* Border styles across editorial lines */
+.dark hr {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .border-black\/5 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark .border-black\/10 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .border-black\/15 {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.dark .border-black\/20 {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark .border-black {
+  border-color: #FAF9F6 !important;
+}
+
+/* Icons adaptation for high contrast */
+.dark .text-black svg {
+  color: #F3F1EC !important;
+}
+
+.dark .bg-black {
+  background-color: #FAF9F6 !important;
+  color: #0E0E0D !important;
+}
+
+.dark .bg-black .text-white {
+  color: #0E0E0D !important;
+}
+
+.dark .text-white {
+  /* Leave text-white alone as it is specifically designed to be light/white on accent templates */
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20%, 60% { transform: translateX(-5px); }
@@ -25,4 +190,5 @@
 @utility animate-marquee {
   animation: marquee 12s linear infinite;
 }
+
 
