@@ -244,10 +244,12 @@ export default function ScriptTimeline({
 
       const response = await fetch("/api/generate-voice", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          text: ttsPayloadText,
-          voiceName: selectedVoice,
+          voice: selectedVoice,
+          script: ttsPayloadText,
         }),
       });
 
